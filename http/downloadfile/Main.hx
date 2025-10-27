@@ -1,5 +1,6 @@
 // Import all class needed.
 import haxe3ds.Console;
+
 import haxe3ds.services.APT;
 import haxe3ds.services.FS;
 import haxe3ds.services.GFX;
@@ -7,6 +8,7 @@ import haxe3ds.services.HID;
 import haxe3ds.services.HTTPC;
 import haxe3ds.services.HTTPC.HTTPCInfo;
 import haxe3ds.services.HTTPC.HTTPContext;
+
 import cxx.VoidPtr;
 
 // Uninitialize this file, this will be used in the main function.
@@ -22,21 +24,18 @@ function httpHandler(info:HTTPCInfo, array:Array<VoidPtr>) {
 	// There's multiple in HTTPCInfo, so let's just use a switch.
 	switch (info) {
 		case DOWNLOAD_PENDING: // 1
-			// Write to a file.
-			file.write(untyped __cpp__('(char*)({0})', array[0]), toInt(array[1]));
+			// Write to a file using void.
+			file.writeVoid(array[0], toInt(array[1]));
 
 			// And just print the progress.
 			Sys.println('Total: ${toInt(array[2])} / ${toInt(array[3])} (Downloaded ${toInt(array[1])} bytes.)');
-
-			// To know what those magic "array" means, if using vscode just hover the DOWNLOAD_PENDING enum.
-			// Or just see this: https://github.com/Haxe3DS/Haxe3DS/blob/main/haxe3ds/services/HTTPC.hx#L11
 
 		case DOWNLOAD_FINISHED: // 2
 			// Close the file.
 			file.close();
 
 			// Printing to say you can now exit.
-			Sys.println("Everything's downloaded!");
+			Sys.println('${ConsoleColor.textGreen}Everything\'s downloaded!${ConsoleColor.textWhite}');
 			Sys.println("Press [START] to exit.");
 	}
 }
@@ -50,7 +49,11 @@ function main() {
 	Console.init(GFX_TOP);
 
 	// Create a constructor for the context.
-	var http:HTTPContext = new HTTPContext("https://raw.githubusercontent.com/JordanSantiagoYT/Mods-for-JS-Engine/refs/heads/main/LONGSONG/data/desert-bus/Desert-bus.json", httpHandler);
+	// We will use discord for this. It's only content size is 10 MiB.
+	var http:HTTPContext = new HTTPContext("https://cdn.discordapp.com/attachments/1126244249780895777/1432360261150441664/long_file.txt?ex=6900c4f2&is=68ff7372&hm=c22a37cd4c3df9562111793ad0db6af8ac643d43186d78ccf35e67f9202c9211&", httpHandler);
+
+	// Set the download speed to any amount, for buffer safety use less number for this!
+	http.downloadSpeed = 0x8000; // 32768
 
 	// And construct the file too using this path.
 	file = new FSFile(http.file);
@@ -61,6 +64,9 @@ function main() {
 	// Start the request.
 	Sys.println('Now downloading the file from ${http.url}, and saving it in sdmc:${http.file}.');
 	http.request();
+
+	// Input the response that we've gotten.
+	Sys.println('Result: ${http.reason} (${http.result})');
 
 	// Main Loop
 	while (APT.mainLoop()) {
