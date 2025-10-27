@@ -1,6 +1,5 @@
 // Import all class needed.
 import haxe3ds.Console;
-
 import haxe3ds.services.APT;
 import haxe3ds.services.FS;
 import haxe3ds.services.GFX;
@@ -8,10 +7,9 @@ import haxe3ds.services.HID;
 import haxe3ds.services.HTTPC;
 import haxe3ds.services.HTTPC.HTTPCInfo;
 import haxe3ds.services.HTTPC.HTTPContext;
-
 import cxx.VoidPtr;
 
-// Declare this variable, this will be used in the main function.
+// Declare this file, this will be used in the main function.
 var file:FSFile;
 
 // Use a built in feature from haxe that converts a pointer to integer
@@ -48,11 +46,12 @@ function main() {
 	HTTPC.init();
 	Console.init(GFX_TOP);
 
-	// Create a constructor for the context.
-	// We will use discord for this. It's only content size is 10 MiB.
-	var http:HTTPContext = new HTTPContext("https://cdn.discordapp.com/attachments/1126244249780895777/1432360261150441664/long_file.txt?ex=6900c4f2&is=68ff7372&hm=c22a37cd4c3df9562111793ad0db6af8ac643d43186d78ccf35e67f9202c9211&", httpHandler);
+	// Create an instance for the context.
+	// We will use a url from devkitPro for this. It's only content size is 230,400 bytes.
+	var http:HTTPContext = new HTTPContext("http://devkitpro.org/misc/httpexample_rawimg.rgb", httpHandler);
 
-	// Set the download speed to any amount, for buffer safety use less number for this!
+	// Set the download speed to any amount, for buffer safety use a less number for this!
+	// its default is 0x4000 (16384) but you can also use 0x8000 (32768)
 	http.downloadSpeed = 0x8000; // 32768
 
 	// And construct the file too using this path.
@@ -65,7 +64,7 @@ function main() {
 	Sys.println('Now downloading the file from ${http.url}, and saving it in sdmc:${http.file}.');
 	http.request();
 
-	// Input the response that we've gotten.
+	// Print the response that we've gotten.
 	Sys.println('Result: ${http.reason} (${http.result})');
 
 	// Main Loop
@@ -79,4 +78,3 @@ function main() {
 	FS.exit();
 	GFX.exit();
 }
-
