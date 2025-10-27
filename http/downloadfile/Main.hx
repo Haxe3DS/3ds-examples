@@ -11,7 +11,7 @@ import haxe3ds.services.HTTPC.HTTPContext;
 
 import cxx.VoidPtr;
 
-// Uninitialize this file, this will be used in the main function.
+// Declare this variable, this will be used in the main function.
 var file:FSFile;
 
 // Use a built in feature from haxe that converts a pointer to integer
@@ -79,3 +79,4 @@ function main() {
 	FS.exit();
 	GFX.exit();
 }
+
